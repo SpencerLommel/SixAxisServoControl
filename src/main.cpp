@@ -1,40 +1,46 @@
 #include <PWMServo.h>
 #include <Arduino.h>
- 
-PWMServo myservo;  // create servo object to control a servo
- 
-int pos = 0;  // variable to store the servo position
- 
+
+#define SERVO_PIN_A 9
+#define SERVO_PIN_B 10
+
+PWMServo servoA;
+PWMServo servoB;
+
 void setup() {
-  myservo.attach(
-      SERVO_PIN_A);  // attaches the servo on pin 9 to the servo object
-  // myservo.attach(SERVO_PIN_A, 1000, 2000); // some motors need min/max
-  // setting
+  Serial.begin(9600);
+  servoA.attach(SERVO_PIN_A);
+  servoB.attach(SERVO_PIN_B);
 }
- 
-bool onState = false;
- 
+
 void loop() {
-  if (Serial.available() > 0) {
-    // Read and discard all incoming data to clear the buffer
-    while (Serial.available() > 0) {
-      Serial.read();
-      //Serial.print(onState);
-    }
- 
-    onState = !onState;
- 
-    if (onState) {
-      for (pos = 0; pos < 180;
-           pos += 1) {  // goes from 0 degrees to 180 degrees, 1 degree steps
-        myservo.write(pos);  // tell servo to go to position in variable 'pos'
-        delay(15);           // waits 15ms for the servo to reach the position
+  static String input = "";
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    if (c == '\n' || c == '\r') {
+      if (input.length() > 0) {
+        processCommand(input);
+        input = "";
       }
-      for (pos = 180; pos >= 1;
-           pos -= 1) {       // goes from 180 degrees to 0 degrees
-        myservo.write(pos);  // tell servo to go to position in variable 'pos'
-        delay(15);           // waits 15ms for the servo to reach the position
-      }
+    } else {
+      input += c;
     }
+  }
+}
+
+void processCommand(const String& cmd) {
+  // Expecting format: S1P70 or S2P180
+  if (cmd.length() < 4) return;
+
+  int servoNum = cmd.substring(1, 2).toInt();
+  int pIndex = cmd.indexOf('P');
+  if (pIndex == -1) return;
+  int pos = cmd.substring(pIndex + 1).toInt();
+  if (pos < 0 || pos > 180) return;
+
+  if (servoNum == 1) {
+    servoA.write(pos);
+  } else if (servoNum == 2) {
+    servoB.write(pos);
   }
 }
