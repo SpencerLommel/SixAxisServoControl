@@ -32,7 +32,7 @@ void processCommand(const String& cmd) {
 
 void loop() {
   static String input = "";
-  while (Serial.available() > 0) {
+  while (Serial.available() > 6) {
     char c = Serial.read();
     if (c == '\n' || c == '\r') {
       input = ""; // Reset on newline, ignore incomplete commands
@@ -47,3 +47,5 @@ void loop() {
     }
   }
 }
+
+
