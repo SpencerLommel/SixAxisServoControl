@@ -13,21 +13,6 @@ void setup() {
   servoB.attach(SERVO_PIN_B);
 }
 
-void loop() {
-  static String input = "";
-  while (Serial.available() > 0) {
-    char c = Serial.read();
-    if (c == '\n' || c == '\r') {
-      if (input.length() > 0) {
-        processCommand(input);
-        input = "";
-      }
-    } else {
-      input += c;
-    }
-  }
-}
-
 void processCommand(const String& cmd) {
   // Expecting format: S1P70 or S2P180
   if (cmd.length() < 4) return;
@@ -44,3 +29,19 @@ void processCommand(const String& cmd) {
     servoB.write(pos);
   }
 }
+
+void loop() {
+  static String input = "";
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    if (c == '\n' || c == '\r') {
+      if (input.length() > 0) {
+        processCommand(input);
+        input = "";
+      }
+    } else {
+      input += c;
+    }
+  }
+}
+
