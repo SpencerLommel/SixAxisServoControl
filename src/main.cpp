@@ -35,12 +35,15 @@ void loop() {
   while (Serial.available() > 0) {
     char c = Serial.read();
     if (c == '\n' || c == '\r') {
-      if (input.length() > 0) {
-        processCommand(input);
-        input = "";
-      }
+      input = ""; // Reset on newline, ignore incomplete commands
     } else {
       input += c;
+      if (input.length() == 6) { // Only process when exactly 6 chars received
+        processCommand(input);
+        input = "";
+      } else if (input.length() > 6) {
+        input = ""; // Reset if input is too long (invalid command)
+      }
     }
   }
 }
