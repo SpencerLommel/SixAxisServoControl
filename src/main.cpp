@@ -45,6 +45,7 @@ void loop() {
         input = ""; // Reset if input is too long (invalid command)
       }
     }
+    Serial.clear();
   }
 }
 
