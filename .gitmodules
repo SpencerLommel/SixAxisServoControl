@@ -1,0 +1,3 @@
+[submodule "include/PWMServo"]
+	path = include/PWMServo
+	url = https://github.com/PaulStoffregen/PWMServo
