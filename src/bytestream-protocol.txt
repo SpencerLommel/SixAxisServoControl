@@ -1,0 +1,27 @@
+PACKET_START = 255 // 0xFF
+PACKET_END   = 254 // 0xFE 
+
+PACKET_CMD = {
+    0: reserved, // 0x00 | (reserved for reset if needed)
+    1: move    
+}
+
+PACKET_SERVO = {
+    0: all servos, // 0x00
+    1: servo 1,    // 0x01
+    2: servo 2,    // 0x02
+    etc...
+}
+
+PACKET_POSITION = 0-180 // 0x00 - 0xBF
+
+
+
+we should send 
+[PACKET_START]
+[PACKET_CMD]
+[PACKET_SERVO]
+[PACKET_POSITION]
+[PACKET_END]
+
+

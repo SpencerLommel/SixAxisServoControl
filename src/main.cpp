@@ -1,8 +1,12 @@
 #include <PWMServo.h>
 #include <Arduino.h>
 
-#define SERVO_PIN_A 9
-#define SERVO_PIN_B 10
+#define SERVO_PIN_A 7
+#define SERVO_PIN_B 8
+#define SERVO_PIN_C 9
+#define SERVO_PIN_D 10
+#define SERVO_PIN_E 11
+#define SERVO_PIN_F 12
 
 PWMServo servoA;
 PWMServo servoB;
