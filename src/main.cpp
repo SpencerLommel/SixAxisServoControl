@@ -2,8 +2,6 @@
 #include <Ethernet.h>
 #include <Mudbus.h>
 
-#define INPUT_A;
-
 uint8_t mac[6];
 
 Mudbus Mb;
@@ -27,7 +25,7 @@ void setup()
   mac[2] = 90;
   mac[3] = 88;
   mac[4] = 57;
-  mac[6] = 67;
+  mac[5] = 67;
 
   Serial.begin(9600);
   Serial.println("Connecting to ethernet");
