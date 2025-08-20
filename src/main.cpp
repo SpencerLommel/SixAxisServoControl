@@ -1,56 +1,73 @@
-#include <PWMServo.h>
 #include <Arduino.h>
+#include <Ethernet.h>
+#include <Mudbus.h>
 
-#define SERVO_PIN_A 7
-#define SERVO_PIN_B 8
-#define SERVO_PIN_C 9
-#define SERVO_PIN_D 10
-#define SERVO_PIN_E 11
-#define SERVO_PIN_F 12
+#define INPUT_A;
 
-PWMServo servoA;
-PWMServo servoB;
+uint8_t mac[6];
 
-void setup() {
+Mudbus Mb;
+
+// ===== Hardware Pin Constants ===== //
+const int SCS = 10, ETHLINK = 14, ETHRX = 15, ETHTX = 16;
+const int TRST = 17, TPGM = 20, ETHRST = 21;
+
+void resetEthernet()
+{
+  digitalWrite(ETHRST, LOW);
+  delay(5);
+  digitalWrite(ETHRST, HIGH);
+  delay(50);
+}
+
+void setup()
+{
+  mac[0] = 04;
+  mac[1] = 111;
+  mac[2] = 90;
+  mac[3] = 88;
+  mac[4] = 57;
+  mac[6] = 67;
+
   Serial.begin(9600);
-  servoA.attach(SERVO_PIN_A);
-  servoB.attach(SERVO_PIN_B);
+  Serial.println("Connecting to ethernet");
+
+  pinMode(SCS, OUTPUT);
+  digitalWrite(SCS, HIGH);
+  pinMode(ETHLINK, INPUT);
+  pinMode(ETHRX, INPUT);
+  pinMode(ETHTX, INPUT);
+  pinMode(TRST, OUTPUT);
+  digitalWrite(TRST, LOW);
+  pinMode(TPGM, OUTPUT);
+  digitalWrite(TPGM, LOW);
+  pinMode(ETHRST, OUTPUT);
+  digitalWrite(ETHRST, HIGH);
+
+  delay(1000);
+
+  resetEthernet();
+
+  IPAddress deviceIP = IPAddress(10, 30, 128, 81);
+  IPAddress gateway = IPAddress(10, 30, 1, 1);
+  IPAddress subnet = IPAddress(255, 255, 0, 0);
+
+  Ethernet.begin(mac, deviceIP, gateway, gateway, subnet);
+
+  delay(2000);
+  Serial.println(Ethernet.localIP()[0]);
+  Serial.println(Ethernet.localIP()[1]);
+  Serial.println(Ethernet.localIP()[2]);
+  Serial.println(Ethernet.localIP()[3]);
 }
 
-void processCommand(const String& cmd) {
-  // Expecting format: S1P70 or S2P180
-  if (cmd.length() < 4) return;
+// void runModbusServer() {
+//   Serial.println(digitalRead(22));
+// }
 
-  int servoNum = cmd.substring(1, 2).toInt();
-  int pIndex = cmd.indexOf('P');
-  if (pIndex == -1) return;
-  int pos = cmd.substring(pIndex + 1).toInt();
-  if (pos < 0 || pos > 180) return;
-
-  if (servoNum == 1) {
-    servoA.write(pos);
-  } else if (servoNum == 2) {
-    servoB.write(pos);
-  }
+void loop()
+{
+  Mb.C[1] = digitalRead(22);
+  Mb.Run();
+  delay(100);
 }
-
-void loop() {
-  static String input = "";
-  while (Serial.available() > 6) {
-    char c = Serial.read();
-    if (c == '\n' || c == '\r') {
-      input = ""; // Reset on newline, ignore incomplete commands
-    } else {
-      input += c;
-      if (input.length() == 6) { // Only process when exactly 6 chars received
-        processCommand(input);
-        input = "";
-      } else if (input.length() > 6) {
-        input = ""; // Reset if input is too long (invalid command)
-      }
-    }
-    Serial.clear();
-  }
-}
-
-
